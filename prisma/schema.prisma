@@ -10,61 +10,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Campus {
-  id         String       @id @default(cuid())
-  name       String
-  shortName  String
-  Restaurant Restaurant[]
-}
-
 model Restaurant {
-  id           String    @id @default(cuid())
-  imageUrl     String
-  name         String
-  runningHours String
-  location     String
-  costEstimate String
-  avgRating    Decimal
-  campus       Campus    @relation(fields: [campusId], references: [id])
-  campusId     String
-  Cuisine      Cuisine[]
-  Reviews      Reviews[]
-}
-
-model Cuisine {
-  id           String     @id @default(cuid())
-  name         String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
-  restaurantId String
-  Dish         Dish[]
-}
-
-model Dish {
-  id              String      @id @default(cuid())
-  name            String
-  ingredientsDesc String
-  calories        String
-  price           Decimal
-  cuisine         Cuisine     @relation(fields: [cuisineId], references: [id])
-  cuisineId       String
-  Favourite       Favourite[]
+  id         String      @id @default(cuid())
+  name       String
+  avgRating  Decimal
+  campusId   String
+  campusName String
+  Favourite  Favourite[]
 }
 
 model Favourite {
-  id     String @id @default(cuid())
-  custId String
-  dish   Dish   @relation(fields: [dishId], references: [id])
-  dishId String
-
-  @@unique([custId, dishId])
+  id           String     @id @default(cuid())
+  custId       String
+  dish         Json
+  dishId       String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId String
+  @@unique([custId, dishId], name: "customer_favourite")
 }
 
 model Reviews {
-  id           String     @id @default(cuid())
+  id           String   @id @default(cuid())
   description  String
   custId       String
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
-  custName     String
   restaurantId String
-  createdAt    DateTime   @default(now())
+  custName     String
+  createdAt    DateTime @default(now())
+}
+
+model Rating {
+  id           String  @id @default(cuid())
+  custId       String
+  restaurantId String
+  rating       Decimal
+
+  @@unique([custId, restaurantId], name: "customer_rating")
 }

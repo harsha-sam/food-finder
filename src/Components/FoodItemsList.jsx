@@ -1,24 +1,38 @@
 import { Card, Space, Tag, Typography, List, message } from 'antd';
 import { HeartOutlined, HeartFilled } from '@ant-design/icons';
 import { useAuthContext } from '@/contexts/AuthContext';
-import axios from 'axios';
+import { axiosInstance } from '@/api-config';
+import { useEffect, useState } from 'react';
 
 const { Text } = Typography;
 const { Meta } = Card;
-const FoodItemsList = ({ items }) => {
+const FoodItemsList = ({ restaurantId, items, favourites = [] }) => {
   const {
-    authState: {
-      user
-    }
+    authState: { user },
   } = useAuthContext();
-  const handleFavourite = (id) => {
+  const [localFavourites, setLocalFavourites] = useState(favourites);
+
+  useEffect(() => {
+    setLocalFavourites(favourites);
+  }, [favourites]);
+  const handleFavourite = (item) => {
     if (user) {
-      axios
+      axiosInstance
         .post('/api/favourites', {
-          custId: user.id,
-          dishId: id,
+          restaurantId,
+          dish: item,
+          dishId: item.id,
         })
-        .then(() => {
+        .then((res) => {
+          setLocalFavourites([
+            ...localFavourites,
+            {
+              id: res.data.id,
+              custId: res.data.custId,
+              dishId: res.data.dishId,
+              restaurantId: res.data.restaurantId
+            }
+          ]);
           message.success('Success !');
         })
         .catch((err) => {
@@ -27,16 +41,36 @@ const FoodItemsList = ({ items }) => {
               'something went wrong, please try again'
           );
         });
-    }
-    else {
+    } else {
       message.error('Please login to favourite a dish');
     }
-  }
+  };
+  const handleRemoveFavourite = (item) => {
+    axiosInstance
+      .delete(`/api/favourites/${item.id}`)
+      .then(() => {
+        setLocalFavourites(
+          localFavourites.filter((ele) => ele.dishId !== item.dishId)
+        );
+        message.success('Removed favourite');
+      })
+      .catch((err) => {
+        message.error('Something went wrong, please try again');
+      });
+  };
+  console.log(localFavourites, 'favs');
   return (
     <List
       dataSource={items}
       renderItem={(item) => {
-        const { id, name, ingredientsDesc, price, calories } = item;
+        const {
+          id,
+          label: { en: name },
+          description: { en: ingredientsDesc },
+          price,
+          nutrition: { calories },
+        } = item;
+        const elements = localFavourites.filter((ele) => ele.dishId === id)
         return (
           <Card key={id} style={{ marginBottom: '5px' }}>
             <Space
@@ -46,10 +80,18 @@ const FoodItemsList = ({ items }) => {
             >
               <Meta title={name} description={ingredientsDesc} />
               <div>
-                <Tag>{calories} Cals</Tag>
-                <HeartOutlined onClick={() => handleFavourite(id)}/>
+                <Tag>
+                  {calories.amount > 0
+                    ? `${calories.amount} Cals`
+                    : `Unknown Cals`}
+                </Tag>
+                { elements.length ? (
+                  <HeartFilled onClick={() => handleRemoveFavourite(elements[0])} />
+                ) : (
+                  <HeartOutlined onClick={() => handleFavourite(item)} />
+                )}
               </div>
-              <Text style={{ fontSize: '28px' }}>{price}</Text>
+              <Text style={{ fontSize: '28px' }}>{price.amount}</Text>
             </Space>
           </Card>
         );

@@ -9,6 +9,12 @@ async function handler(req, res) {
       const { full_name, email, password } = req.body;
       const salt = bcrypt.genSaltSync(12);
       let encryptedPassword = bcrypt.hashSync(password, salt);
+      const usr = await db.collection('users').findOne({
+        email,
+      });
+      if (usr) {
+        throw new Error('User already exists with this email')
+      }
       const data = await db.collection('users').insertOne({
         full_name,
         email,

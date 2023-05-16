@@ -4,7 +4,7 @@ import useLoader from '@/hooks/useLoader';
 import { Form, Input, Button, Row, Col, Typography, message } from 'antd';
 // icons
 import { MailOutlined, LockOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import { axiosInstance } from '@/api-config';
 import { useAuthContext } from '@/contexts/AuthContext.jsx';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -25,20 +25,20 @@ export default function Login() {
   useEffect(() => {
     if (user && user.email) {
       message.warning('User already logged in');
-      router.back();
+      router.push('/')
     }
-  }, [])
+  }, [user, router])
   const [isSubmitted, setIsSubmitted] = useLoader(false);
 
   const onFinish = (values) => {
     // submit button loader should be triggered
     setIsSubmitted(true);
-    axios.post('/api/auth/login', values)
+    axiosInstance.post('/api/auth/login', values)
       .then((response) => {
         setUser({
           user: response.data,
-          accessToken: response.data['access-token'],
-          refreshToken: response.data['refresh-token'],
+          accessToken: response.data.accessToken,
+          refreshToken: response.data.refreshToken,
         });
         message.success('Logged in !');
         router.push('/')

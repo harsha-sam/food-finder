@@ -1,9 +1,9 @@
-import React, { useContext, useReducer } from 'react';
+import React, { useEffect, useContext, useReducer } from 'react';
 import { authInitialState, authReducer } from './reducers/authReducer';
 import {
-  SET_USER,
-  UPDATE_USER,
+  SET_USER
 } from './actionTypes';
+import { axiosInstance } from '@/api-config';
 import { message } from 'antd';
 
 const AuthContext = React.createContext();
@@ -11,6 +11,20 @@ const AuthContext = React.createContext();
 export const AuthProvider = ({ children }) => {
   const [authState, authDispatch] = useReducer(authReducer, authInitialState);
 
+  useEffect(() => {
+     // fetching user info with access token
+     if (localStorage.getItem('access-token')) {
+       axiosInstance
+         .get('/api/auth/me')
+         .then((response) => {
+           authDispatch({ type: SET_USER, payload: response.data });
+         })
+         .catch((err) => {
+           console.log(err)
+           message.warning('Session expired, please login again');
+         })
+     } 
+   }, []);
 
   const setUser = (payload) => {
     // storing access token and refresh token in local storage
@@ -26,7 +40,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('access-token');
     localStorage.removeItem('refresh-token');
     await message.success('Logged out', 0.5);
-    window.location = '/auth/login';
+    window.location = '/api/auth/login';
     window.location.reload(false);
   };
 

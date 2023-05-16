@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import bgImg from '@/assets/background.jpg';
 import orderImg from '@/assets/order-food.svg';
-import axios from 'axios';
+import { axiosInstance } from '@/api-config';
 import { useEffect, useState } from 'react';
 
 const { Title, Text } = Typography;
@@ -13,7 +13,7 @@ export default function Homepage() {
   
   useEffect(() => {
     const fetchCampus = async () => {
-      const response = await axios.get('/api/campus');
+      const response = await axiosInstance.get('/api/campus');
       return response;
     };
     fetchCampus().then((response) => {

@@ -2,7 +2,7 @@ import { List } from 'antd';
 import Link from 'next/link';
 import RestaurantCard from './RestaurantCard';
 
-const Results = ({ data }) => {
+const Results = ({ data, campus }) => {
 
   return (
     <div style={{ marginTop: '50px' }}>
@@ -18,7 +18,7 @@ const Results = ({ data }) => {
           }}
           dataSource={data}
           renderItem={(item) => (
-            <Link href={`/restaurants/${item.id}`} key={item.id}>
+            <Link href={`/campus/${campus.id}/restaurants/${item.id}`} key={item.id}>
               <List.Item>
                 <RestaurantCard {...item} />
               </List.Item>

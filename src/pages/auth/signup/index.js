@@ -2,7 +2,7 @@ import Link from 'next/link';
 import useLoader from '@/hooks/useLoader';
 import { Form, Input, Button, Row, Col, Typography, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
-import axios from 'axios';
+import { axiosInstance } from '@/api-config';
 import { useAuthContext } from '@/contexts/AuthContext.jsx';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
@@ -22,12 +22,12 @@ export default function Signup() {
       message.warning('User already logged in');
       router.back();
     }
-  }, [])
+  }, [user])
 
   const onFinish = (values) => {
     // submit button loader should be triggered
     setIsSubmitted(true);
-    axios.post('/api/auth/signup', values)
+    axiosInstance.post('/api/auth/signup', values)
       .then(() => {
         message.success('Success !');
       })

@@ -8,8 +8,9 @@ const RestaurantCard = ({
   location,
   costEstimate,
   avgRating,
+  disabled=true,
   width = 400,
-  height = 550,
+  height = 400,
 }) => {
 
   return (
@@ -26,7 +27,12 @@ const RestaurantCard = ({
         <Meta title={name} description={runningHours} />
         <Tag color='red'>{location}</Tag>
         <Text style={{ fontSize: '28px' }}>{costEstimate}</Text>
-        <Rate value={avgRating} style={{ marginLeft: '10px' }} disabled/>
+        <Rate
+          value={avgRating}
+          style={{ marginLeft: '10px' }}
+          disabled
+          tooltips={['terrible', 'bad', 'normal', 'good', 'love it']}
+        />
       </Space>
     </Card>
   );
