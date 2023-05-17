@@ -26,7 +26,6 @@ const RestaurantCard = ({
       <Space direction='vertical' size='middle' style={{ display: 'flex' }}>
         <Meta title={name} description={runningHours} />
         <Tag color='red'>{location}</Tag>
-        <Text style={{ fontSize: '28px' }}>{costEstimate}</Text>
         <Rate
           value={avgRating}
           style={{ marginLeft: '10px' }}
