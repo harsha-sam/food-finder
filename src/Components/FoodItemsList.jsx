@@ -58,7 +58,6 @@ const FoodItemsList = ({ restaurantId, items, favourites = [] }) => {
         message.error('Something went wrong, please try again');
       });
   };
-  console.log(localFavourites, 'favs');
   return (
     <List
       dataSource={items}

@@ -73,7 +73,6 @@ async function handler(req, res) {
                 name,
                 location,
                 defaultMenuId: menus[0].id,
-                costEstimate: '$',
                 avgRating,
               };
             }
@@ -91,6 +90,7 @@ async function handler(req, res) {
           }
         );
         let myRating = 0;
+        let favourites = [];
         if (user) {
           const userRating = await prisma.rating.findUnique({
             where: {
@@ -105,22 +105,22 @@ async function handler(req, res) {
           } else {
             myRating = userRating.rating;
           }
+          favourites = await prisma.favourite.findMany({
+            where: {
+              custId: user.id.toString(),
+              restaurantId,
+            },
+            select: {
+              id: true,
+              custId: true,
+              dishId: true,
+              restaurantId: true,
+            },
+          });
         }
         const reviews = await prisma.reviews.findMany({
           where: {
             restaurantId,
-          },
-        });
-        const favourites = await prisma.favourite.findMany({
-          where: {
-            custId: user.id.toString(),
-            restaurantId,
-          },
-          select: {
-            id: true,
-            custId: true,
-            dishId: true,
-            restaurantId: true
           },
         });
         const { groups } = restaurantData.data;
@@ -131,9 +131,9 @@ async function handler(req, res) {
           myRating,
           campus: {
             campusId,
-            campusName
+            campusName,
           },
-          favourites
+          favourites,
         });
       }
     } catch (err) {
